@@ -1,3 +1,4 @@
+from typing import Text
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -388,7 +389,7 @@ def glamour_parser(query:str, results:list) -> list:
 
         results.extend(preprocess_text(p_els))
 
-def afisha_parser(query:str, results:list = []) -> list:
+def afisha_parser(query:str, results:list) -> list:
     global link_limit
 
     url = create_url("https://www.afisha.ru/search/?query=", query)
@@ -411,4 +412,57 @@ def afisha_parser(query:str, results:list = []) -> list:
 
         p_els = soup.find_all('p')
 
+        results.extend(preprocess_text(p_els))
+
+def rtvi_parser(query:str, results:list) -> list:
+    global link_limit
+
+    url = create_url("https://rtvi.com/search/?q=", query)
+    links = []
+
+    html = requests.get(url).text
+
+    soup = BeautifulSoup(html, "html.parser")
+    div_els = soup.find_all('div', {'class' : 'zag'})
+    
+    soup = BeautifulSoup(str(div_els), "html.parser")
+    a_els = soup.find_all('a')
+
+    for a_el in a_els:
+        links.append(f"https://rtvi.com{a_el['href']}")
+
+    for link in links[:link_limit]:
+        html = requests.get(link).text
+        soup = BeautifulSoup(html, "html.parser")
+
+        div_el = soup.find_all('div', {'class' : 'text'})
+        soup = BeautifulSoup(str(div_el), "html.parser")
+
+        p_els = soup.find_all('p')
+
+        results.extend(preprocess_text(p_els))
+
+def tvrain_parser(query:str, results:list = []) -> list:
+    global link_limit
+
+    url = create_url("https://tvrain.ru/archive/?query=", query)
+    links = []
+
+    html = requests.get(url).text
+    soup = BeautifulSoup(html, "html.parser")
+
+    a_els = soup.find_all('a', {'class':'chrono_list__item__info__name chrono_list__item__info__name--nocursor'})
+
+    for a_el in a_els:
+        links.append(f"https://tvrain.ru{a_el['href']}")
+
+    for link in links[:link_limit]:
+        html = requests.get(link).text
+    
+        soup = BeautifulSoup(html, "html.parser")
+        div_els = soup.find_all('div', {'class' : 'article-full__text'})
+
+        soup = BeautifulSoup(str(div_els), "html.parser")
+        p_els = soup.find_all('p')\
+    
         results.extend(preprocess_text(p_els))

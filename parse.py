@@ -5,7 +5,7 @@ class Parser:
     def __init__(self):
         self.parsers = (tatler_parser, sobaka_parser, esquire_parser, kommersant_parser, rbc_parser, 
             dp_parsing, forbes_parser, sports_ru_parser, village_parser, flow_parser, elle_parser, 
-            glamour_parser, afisha_parser)
+            glamour_parser, afisha_parser, rtvi_parser, tvrain_parser)
 
     def parse(self, query:str) -> list:
         thread_list, results = [], []
