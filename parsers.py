@@ -387,3 +387,28 @@ def glamour_parser(query:str, results:list) -> list:
         p_els = soup.find_all('p')
 
         results.extend(preprocess_text(p_els))
+
+def afisha_parser(query:str, results:list = []) -> list:
+    global link_limit
+
+    url = create_url("https://www.afisha.ru/search/?query=", query)
+    links = []
+
+    html = requests.get(url).text
+    soup = BeautifulSoup(html, "html.parser")
+
+    a_els = soup.find_all('a', {'class':'_3NqYW DWsHS _3lmHp wkn_c'})
+
+    for a_el in a_els:
+        links.append(f"https://afisha.ru{a_el['href']}")
+
+    for link in links[:link_limit]:
+        html = requests.get(link).text
+        soup = BeautifulSoup(html, "html.parser")
+
+        div_el = soup.find_all('div', {'class':'article'})
+        soup = BeautifulSoup(str(div_el), "html.parser")
+
+        p_els = soup.find_all('p')
+
+        results.extend(preprocess_text(p_els))
