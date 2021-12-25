@@ -1,24 +1,25 @@
 import threading
 from parsers import *
 
-parsers = (tatler_parser, sobaka_parser, esquire_parser, kommersant_parser, rbc_parser, 
+class Parser:
+    def __init__(self):
+        self.parsers = (tatler_parser, sobaka_parser, esquire_parser, kommersant_parser, rbc_parser, 
             dp_parsing, forbes_parser, sports_ru_parser, village_parser, flow_parser, elle_parser, 
             glamour_parser, afisha_parser)
 
-def parse(query:str) -> list:
-    global parsers
+    def parse(self, query:str) -> list:
+        thread_list, results = [], []
 
-    thread_list, results = [], []
+        for func in self.parsers:
+            thread = threading.Thread(target=func, args=(query,results))
+            thread_list.append(thread,)
+            thread.start()
+        
+        for i in range(len(thread_list)):
+            thread_list[i].join()
 
-    for func in parsers:
-        thread = threading.Thread(target=func, args=(query,results))
-        thread_list.append(thread,)
-        thread.start()
-    
-    for i in range(len(thread_list)):
-        thread_list[i].join()
+        return results
 
-    return results
-
-texts = parse(input('Please choose a celebrity: '))
+parser = Parser()
+texts = parser.parse(input("Celebrity name: "))
 print(texts)
